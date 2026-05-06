@@ -98,7 +98,9 @@ message AuthMethod {
           "  \"claims_scopes\": [],\n"
           "  \"account_claim_maps\": [],\n"
           "  \"disable_discovered_config_validation\": false,\n"
-          "  \"prompts\": []\n"
+          "  \"prompts\": [],\n"
+          "  \"google_workspace_service_account_json\": \"google_workspace_service_account_json\",\n"
+          "  \"google_workspace_admin_email\": \"google_workspace_admin_email\"\n"
           "}\n"
           "```\n"
           "For LDAP auth methods, the parameters are:\n"
@@ -358,6 +360,36 @@ message OidcAuthMethodAttributes {
     (custom_options.v1.mask_mapping) = {
       this: "attributes.prompts"
       that: "Prompts"
+    }
+  ]; // @gotags: `class:"public"`
+
+  // The JSON key of a Google service account that has been granted
+  // domain-wide delegation with the scope
+  // https://www.googleapis.com/auth/admin.directory.group.readonly.
+  // When set together with google_workspace_admin_email, Boundary calls
+  // the Google Admin SDK Directory API after token exchange to fetch the
+  // authenticating user's group memberships and inject them into the
+  // userinfo claims as "groups". Write-only: the value is encrypted at
+  // rest and never returned by the API.
+  google.protobuf.StringValue google_workspace_service_account_json = 150 [
+    json_name = "google_workspace_service_account_json",
+    (custom_options.v1.generate_sdk_option) = true,
+    (custom_options.v1.mask_mapping) = {
+      this: "attributes.google_workspace_service_account_json"
+      that: "GoogleWorkspaceServiceAccountJson"
+    },
+    (google.api.field_behavior) = INPUT_ONLY
+  ]; // @gotags: `class:"secret"`
+
+  // The email address of a Google Workspace admin that Boundary
+  // impersonates (via domain-wide delegation) when calling the Directory
+  // API. Must be set together with google_workspace_service_account_json.
+  google.protobuf.StringValue google_workspace_admin_email = 160 [
+    json_name = "google_workspace_admin_email",
+    (custom_options.v1.generate_sdk_option) = true,
+    (custom_options.v1.mask_mapping) = {
+      this: "attributes.google_workspace_admin_email"
+      that: "GoogleWorkspaceAdminEmail"
     }
   ]; // @gotags: `class:"public"`
 }
