@@ -376,9 +376,14 @@ type OidcAuthMethodAttributes struct {
 	// a result of the update request.
 	DryRun bool `protobuf:"varint,130,opt,name=dry_run,proto3" json:"dry_run,omitempty" class:"public"` // @gotags: `class:"public"`
 	// The prompts allowed for the auth method.
-	Prompts       []string `protobuf:"bytes,140,rep,name=prompts,proto3" json:"prompts,omitempty" class:"public"` // @gotags: `class:"public"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Prompts []string `protobuf:"bytes,140,rep,name=prompts,proto3" json:"prompts,omitempty" class:"public"` // @gotags: `class:"public"`
+	// The JSON key of a Google service account with domain-wide delegation.
+	// Write-only (INPUT_ONLY): never returned by the API.
+	GoogleWorkspaceServiceAccountJson *wrapperspb.StringValue `protobuf:"bytes,150,opt,name=google_workspace_service_account_json,json=googleWorkspaceServiceAccountJson,proto3" json:"google_workspace_service_account_json,omitempty" class:"secret"` // @gotags: `class:"secret"`
+	// The email address of the Google Workspace admin Boundary impersonates.
+	GoogleWorkspaceAdminEmail *wrapperspb.StringValue `protobuf:"bytes,160,opt,name=google_workspace_admin_email,json=googleWorkspaceAdminEmail,proto3" json:"google_workspace_admin_email,omitempty" class:"public"` // @gotags: `class:"public"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *OidcAuthMethodAttributes) Reset() {
@@ -519,6 +524,20 @@ func (x *OidcAuthMethodAttributes) GetDryRun() bool {
 func (x *OidcAuthMethodAttributes) GetPrompts() []string {
 	if x != nil {
 		return x.Prompts
+	}
+	return nil
+}
+
+func (x *OidcAuthMethodAttributes) GetGoogleWorkspaceServiceAccountJson() *wrapperspb.StringValue {
+	if x != nil {
+		return x.GoogleWorkspaceServiceAccountJson
+	}
+	return nil
+}
+
+func (x *OidcAuthMethodAttributes) GetGoogleWorkspaceAdminEmail() *wrapperspb.StringValue {
+	if x != nil {
+		return x.GoogleWorkspaceAdminEmail
 	}
 	return nil
 }
