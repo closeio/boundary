@@ -27,6 +27,8 @@ type OidcAuthMethodAttributes struct {
 	DisableDiscoveredConfigValidation bool     `json:"disable_discovered_config_validation,omitempty"`
 	DryRun                            bool     `json:"dry_run,omitempty"`
 	Prompts                           []string `json:"prompts,omitempty"`
+	GoogleWorkspaceServiceAccountJson string   `json:"google_workspace_service_account_json,omitempty"`
+	GoogleWorkspaceAdminEmail         string   `json:"google_workspace_admin_email,omitempty"`
 }
 
 func AttributesMapToOidcAuthMethodAttributes(in map[string]any) (*OidcAuthMethodAttributes, error) {

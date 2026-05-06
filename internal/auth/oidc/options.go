@@ -25,32 +25,34 @@ type Option func(*options)
 
 // options = how options are represented
 type options struct {
-	withName                string
-	withDescription         string
-	withLimit               int
-	withMaxAge              int
-	withApiUrl              *url.URL
-	withCertificates        []*x509.Certificate
-	withAudClaims           []string
-	withSigningAlgs         []Alg
-	withClaimsScopes        []string
-	withPrompts             []PromptParam
-	withEmail               string
-	withFullName            string
-	withOrderByCreateTime   bool
-	ascending               bool
-	withUnauthenticatedUser bool
-	withForce               bool
-	withDryRun              bool
-	withAuthMethod          *AuthMethod
-	withPublicId            string
-	withRoundtripPayload    string
-	withKeyId               string
-	withIssuer              *url.URL
-	withOperationalState    AuthMethodState
-	withAccountClaimMap     map[string]AccountToClaim
-	withReader              db.Reader
-	withStartPageAfterItem  pagination.Item
+	withName                              string
+	withDescription                       string
+	withLimit                             int
+	withMaxAge                            int
+	withApiUrl                            *url.URL
+	withCertificates                      []*x509.Certificate
+	withAudClaims                         []string
+	withSigningAlgs                       []Alg
+	withClaimsScopes                      []string
+	withPrompts                           []PromptParam
+	withEmail                             string
+	withFullName                          string
+	withOrderByCreateTime                 bool
+	ascending                             bool
+	withUnauthenticatedUser               bool
+	withForce                             bool
+	withDryRun                            bool
+	withAuthMethod                        *AuthMethod
+	withPublicId                          string
+	withRoundtripPayload                  string
+	withKeyId                             string
+	withIssuer                            *url.URL
+	withOperationalState                  AuthMethodState
+	withAccountClaimMap                   map[string]AccountToClaim
+	withReader                            db.Reader
+	withStartPageAfterItem                pagination.Item
+	withGoogleWorkspaceServiceAccountJson string
+	withGoogleWorkspaceAdminEmail         string
 }
 
 func getDefaultOptions() options {
@@ -248,5 +250,24 @@ func WithPrompts(prompt ...PromptParam) Option {
 func WithStartPageAfterItem(item pagination.Item) Option {
 	return func(o *options) {
 		o.withStartPageAfterItem = item
+	}
+}
+
+// WithGoogleWorkspaceServiceAccountJson provides a Google service account JSON
+// key (plaintext). When paired with WithGoogleWorkspaceAdminEmail, Boundary
+// will call the Google Admin SDK Directory API after OIDC token exchange to
+// fetch the user's group memberships and inject them into userinfo claims.
+func WithGoogleWorkspaceServiceAccountJson(json string) Option {
+	return func(o *options) {
+		o.withGoogleWorkspaceServiceAccountJson = json
+	}
+}
+
+// WithGoogleWorkspaceAdminEmail provides the Google Workspace admin email that
+// Boundary impersonates (via domain-wide delegation) when calling the Directory
+// API. Must be paired with WithGoogleWorkspaceServiceAccountJson.
+func WithGoogleWorkspaceAdminEmail(email string) Option {
+	return func(o *options) {
+		o.withGoogleWorkspaceAdminEmail = email
 	}
 }

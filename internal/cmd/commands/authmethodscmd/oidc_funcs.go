@@ -20,20 +20,22 @@ func init() {
 }
 
 type extraOidcCmdVars struct {
-	flagState                             string
-	flagIssuer                            string
-	flagClientId                          string
-	flagClientSecret                      string
-	flagMaxAgeSeconds                     string
-	flagApiUrlPrefix                      string
-	flagSigningAlgorithms                 []string
-	flagIdpCaCerts                        []string
-	flagAllowedAudiences                  []string
-	flagClaimsScopes                      []string
-	flagAccountClaimMaps                  []string
-	flagDisableDiscoveredConfigValidation bool
-	flagDryRun                            bool
-	flagPrompts                           []string
+	flagState                                    string
+	flagIssuer                                   string
+	flagClientId                                 string
+	flagClientSecret                             string
+	flagMaxAgeSeconds                            string
+	flagApiUrlPrefix                             string
+	flagSigningAlgorithms                        []string
+	flagIdpCaCerts                               []string
+	flagAllowedAudiences                         []string
+	flagClaimsScopes                             []string
+	flagAccountClaimMaps                         []string
+	flagDisableDiscoveredConfigValidation        bool
+	flagDryRun                                   bool
+	flagPrompts                                  []string
+	flagGoogleWorkspaceServiceAccountJson        string
+	flagGoogleWorkspaceAdminEmail                string
 }
 
 const (
@@ -49,9 +51,11 @@ const (
 	claimsScopes                              = "claims-scopes"
 	accountClaimMaps                          = "account-claim-maps"
 	stateFlagName                             = "state"
-	disableDiscoveredConfigValidationFlagName = "disable-discovered-config-validation"
-	dryRunFlagName                            = "dry-run"
-	promptsFlagName                           = "prompts"
+	disableDiscoveredConfigValidationFlagName    = "disable-discovered-config-validation"
+	dryRunFlagName                               = "dry-run"
+	promptsFlagName                              = "prompts"
+	googleWorkspaceServiceAccountJsonFlagName    = "google-workspace-service-account-json"
+	googleWorkspaceAdminEmailFlagName            = "google-workspace-admin-email"
 )
 
 func extraOidcActionsFlagsMapFuncImpl() map[string][]string {
@@ -68,6 +72,8 @@ func extraOidcActionsFlagsMapFuncImpl() map[string][]string {
 			claimsScopes,
 			accountClaimMaps,
 			promptsFlagName,
+			googleWorkspaceServiceAccountJsonFlagName,
+			googleWorkspaceAdminEmailFlagName,
 		},
 		"change-state": {
 			idFlagName,
@@ -167,6 +173,18 @@ func extraOidcFlagsFuncImpl(c *OidcCommand, set *base.FlagSets, _ *base.FlagSet)
 				Name:   promptsFlagName,
 				Target: &c.flagPrompts,
 				Usage:  "The optional prompt parameter that can be included in the authentication request to control the behavior of the authentication flow.",
+			})
+		case googleWorkspaceServiceAccountJsonFlagName:
+			f.StringVar(&base.StringVar{
+				Name:   googleWorkspaceServiceAccountJsonFlagName,
+				Target: &c.flagGoogleWorkspaceServiceAccountJson,
+				Usage:  "The JSON key of a Google service account that has domain-wide delegation with the Admin SDK Directory API read scope. When set together with -google-workspace-admin-email, Boundary fetches the user's Google Workspace group memberships at login time and makes them available to managed-group filters as \"/userinfo/groups\". Write-only: the value is encrypted at rest and never returned by the API. Set to 'null' to clear.",
+			})
+		case googleWorkspaceAdminEmailFlagName:
+			f.StringVar(&base.StringVar{
+				Name:   googleWorkspaceAdminEmailFlagName,
+				Target: &c.flagGoogleWorkspaceAdminEmail,
+				Usage:  "The email address of a Google Workspace admin that Boundary impersonates (via domain-wide delegation) when calling the Directory API. Must be set together with -google-workspace-service-account-json. Set to 'null' to clear.",
 			})
 		}
 	}
@@ -298,6 +316,20 @@ func extraOidcFlagHandlingFuncImpl(c *OidcCommand, f *base.FlagSets, opts *[]aut
 		*opts = append(*opts, authmethods.DefaultOidcAuthMethodPrompts())
 	default:
 		*opts = append(*opts, authmethods.WithOidcAuthMethodPrompts(c.flagPrompts))
+	}
+	switch c.flagGoogleWorkspaceServiceAccountJson {
+	case "":
+	case "null":
+		*opts = append(*opts, authmethods.DefaultOidcAuthMethodGoogleWorkspaceServiceAccountJson())
+	default:
+		*opts = append(*opts, authmethods.WithOidcAuthMethodGoogleWorkspaceServiceAccountJson(c.flagGoogleWorkspaceServiceAccountJson))
+	}
+	switch c.flagGoogleWorkspaceAdminEmail {
+	case "":
+	case "null":
+		*opts = append(*opts, authmethods.DefaultOidcAuthMethodGoogleWorkspaceAdminEmail())
+	default:
+		*opts = append(*opts, authmethods.WithOidcAuthMethodGoogleWorkspaceAdminEmail(c.flagGoogleWorkspaceAdminEmail))
 	}
 
 	return true

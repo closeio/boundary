@@ -45,9 +45,11 @@ const (
 	disableDiscoveredConfigValidationField = "attributes.disable_discovered_config_validation"
 	roundtripPayloadAttributesField        = "attributes.roundtrip_payload"
 	codeField                              = "attributes.code"
-	claimsScopesField                      = "attributes.claims_scopes"
-	accountClaimMapsField                  = "attributes.account_claim_maps"
-	promptsField                           = "attributes.prompts"
+	claimsScopesField                           = "attributes.claims_scopes"
+	accountClaimMapsField                       = "attributes.account_claim_maps"
+	promptsField                                = "attributes.prompts"
+	googleWorkspaceServiceAccountJsonField      = "attributes.google_workspace_service_account_json"
+	googleWorkspaceAdminEmailField              = "attributes.google_workspace_admin_email"
 )
 
 var oidcMaskManager handlers.MaskManager
@@ -483,6 +485,13 @@ func toStorageOidcAuthMethod(ctx context.Context, scopeId string, in *pb.AuthMet
 
 	if len(attrs.GetClaimsScopes()) > 0 {
 		opts = append(opts, oidc.WithClaimsScopes(attrs.GetClaimsScopes()...))
+	}
+
+	if v := strings.TrimSpace(attrs.GetGoogleWorkspaceServiceAccountJson().GetValue()); v != "" {
+		opts = append(opts, oidc.WithGoogleWorkspaceServiceAccountJson(v))
+	}
+	if v := strings.TrimSpace(attrs.GetGoogleWorkspaceAdminEmail().GetValue()); v != "" {
+		opts = append(opts, oidc.WithGoogleWorkspaceAdminEmail(v))
 	}
 
 	if len(attrs.GetAccountClaimMaps()) > 0 {
