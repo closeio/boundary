@@ -187,6 +187,26 @@ func Callback(
 		}
 	}
 
+	// If the auth method has Google Workspace Directory API credentials, fetch
+	// the user's group memberships server-side and inject them into userinfo
+	// claims before managed-group filters are evaluated. A failure here is
+	// non-fatal: we log it and proceed with whatever claims are already present
+	// so that authentication is never blocked by Directory API unavailability.
+	if am.GoogleWorkspaceServiceAccountJson != "" && am.GoogleWorkspaceAdminEmail != "" {
+		userEmail, _ := userInfoClaims["email"].(string)
+		if userEmail == "" {
+			userEmail, _ = idTkClaims["email"].(string)
+		}
+		if userEmail != "" {
+			groups, gwErr := fetchGoogleWorkspaceGroups(ctx, am.GoogleWorkspaceServiceAccountJson, am.GoogleWorkspaceAdminEmail, userEmail)
+			if gwErr != nil {
+				event.WriteError(ctx, op, gwErr, event.WithInfoMsg("google workspace group fetch failed; proceeding without group claims"))
+			} else {
+				userInfoClaims["groups"] = groups
+			}
+		}
+	}
+
 	acct, err := r.upsertAccount(ctx, am, idTkClaims, userInfoClaims)
 	if err != nil {
 		return "", errors.Wrap(ctx, err, op)

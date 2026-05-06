@@ -75,15 +75,17 @@ func NewAuthMethod(ctx context.Context, scopeId string, clientId string, clientS
 
 	a := &AuthMethod{
 		AuthMethod: &store.AuthMethod{
-			ScopeId:          scopeId,
-			Name:             opts.withName,
-			Description:      opts.withDescription,
-			OperationalState: string(opts.withOperationalState),
-			Issuer:           u,
-			ClientId:         clientId,
-			ClientSecret:     string(clientSecret),
-			MaxAge:           int32(opts.withMaxAge),
-			ClaimsScopes:     opts.withClaimsScopes,
+			ScopeId:                           scopeId,
+			Name:                              opts.withName,
+			Description:                       opts.withDescription,
+			OperationalState:                  string(opts.withOperationalState),
+			Issuer:                            u,
+			ClientId:                          clientId,
+			ClientSecret:                      string(clientSecret),
+			MaxAge:                            int32(opts.withMaxAge),
+			ClaimsScopes:                      opts.withClaimsScopes,
+			GoogleWorkspaceServiceAccountJson: opts.withGoogleWorkspaceServiceAccountJson,
+			GoogleWorkspaceAdminEmail:         opts.withGoogleWorkspaceAdminEmail,
 		},
 	}
 	if opts.withApiUrl != nil {
@@ -166,6 +168,11 @@ func (am *AuthMethod) validate(ctx context.Context, caller errors.Op) error {
 	if am.MaxAge < -1 {
 		return errors.New(ctx, errors.InvalidParameter, caller, "max age cannot be less than -1")
 	}
+	hasServiceAccountJson := am.GoogleWorkspaceServiceAccountJson != ""
+	hasAdminEmail := am.GoogleWorkspaceAdminEmail != ""
+	if hasServiceAccountJson != hasAdminEmail {
+		return errors.New(ctx, errors.InvalidParameter, caller, "google_workspace_service_account_json and google_workspace_admin_email must both be set or both be empty")
+	}
 	return nil
 }
 
@@ -179,9 +186,18 @@ func AllocAuthMethod() AuthMethod {
 // Clone an AuthMethod.
 func (am *AuthMethod) Clone() *AuthMethod {
 	cp := proto.Clone(am.AuthMethod)
-	return &AuthMethod{
+	cloned := &AuthMethod{
 		AuthMethod: cp.(*store.AuthMethod),
 	}
+	// The Google Workspace fields use proto field numbers beyond the compiled
+	// binary descriptor, so proto.Clone does not copy them. Copy manually.
+	cloned.GoogleWorkspaceServiceAccountJson = am.GoogleWorkspaceServiceAccountJson
+	cloned.GoogleWorkspaceAdminEmail = am.GoogleWorkspaceAdminEmail
+	if len(am.CtGoogleWorkspaceServiceAccountJson) > 0 {
+		cloned.CtGoogleWorkspaceServiceAccountJson = make([]byte, len(am.CtGoogleWorkspaceServiceAccountJson))
+		copy(cloned.CtGoogleWorkspaceServiceAccountJson, am.CtGoogleWorkspaceServiceAccountJson)
+	}
+	return cloned
 }
 
 // TableName returns the table name.

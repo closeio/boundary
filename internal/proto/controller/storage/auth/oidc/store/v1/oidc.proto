@@ -174,6 +174,29 @@ message AuthMethod {
     this: "Prompts"
     that: "attributes.prompts"
   }];
+
+  // ct_google_workspace_service_account_json is the encrypted Google service
+  // account JSON key used to call the Admin SDK Directory API. Stored as the
+  // column google_workspace_service_account_json in the database.
+  // @inject_tag: `gorm:"column:google_workspace_service_account_json;default:null" wrapping:"ct,google_workspace_service_account_json"`
+  bytes ct_google_workspace_service_account_json = 230;
+
+  // google_workspace_service_account_json is the plaintext service account
+  // JSON key. Not stored in the database.
+  // @inject_tag: `gorm:"-" wrapping:"pt,google_workspace_service_account_json"`
+  string google_workspace_service_account_json = 240 [(custom_options.v1.mask_mapping) = {
+    this: "GoogleWorkspaceServiceAccountJson"
+    that: "attributes.google_workspace_service_account_json"
+  }];
+
+  // google_workspace_admin_email is a Google Workspace admin email address
+  // that Boundary impersonates (via domain-wide delegation) when calling the
+  // Directory API to list a user's group memberships.
+  // @inject_tag: `gorm:"default:null"`
+  string google_workspace_admin_email = 250 [(custom_options.v1.mask_mapping) = {
+    this: "GoogleWorkspaceAdminEmail"
+    that: "attributes.google_workspace_admin_email"
+  }];
 }
 
 // Account represents an OIDC account

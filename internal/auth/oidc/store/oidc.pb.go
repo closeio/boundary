@@ -129,9 +129,19 @@ type AuthMethod struct {
 	// These are Value Objects that will be stored as Prompt messages,
 	// and are operatated on as a complete set.
 	// @inject_tag: `gorm:"-"`
-	Prompts       []string `protobuf:"bytes,220,rep,name=prompts,proto3" json:"prompts,omitempty" gorm:"-"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Prompts []string `protobuf:"bytes,220,rep,name=prompts,proto3" json:"prompts,omitempty" gorm:"-"`
+	// ct_google_workspace_service_account_json is the encrypted Google service
+	// account JSON key. Stored in the column google_workspace_service_account_json.
+	// @inject_tag: `gorm:"column:google_workspace_service_account_json;default:null" wrapping:"ct,google_workspace_service_account_json"`
+	CtGoogleWorkspaceServiceAccountJson []byte `protobuf:"bytes,230,opt,name=ct_google_workspace_service_account_json,json=ctGoogleWorkspaceServiceAccountJson,proto3" json:"ct_google_workspace_service_account_json,omitempty" gorm:"column:google_workspace_service_account_json;default:null" wrapping:"ct,google_workspace_service_account_json"`
+	// google_workspace_service_account_json is the plaintext service account JSON (not stored in the database).
+	// @inject_tag: `gorm:"-" wrapping:"pt,google_workspace_service_account_json"`
+	GoogleWorkspaceServiceAccountJson string `protobuf:"bytes,240,opt,name=google_workspace_service_account_json,json=googleWorkspaceServiceAccountJson,proto3" json:"google_workspace_service_account_json,omitempty" gorm:"-" wrapping:"pt,google_workspace_service_account_json"`
+	// google_workspace_admin_email is the admin email Boundary impersonates when calling the Directory API.
+	// @inject_tag: `gorm:"default:null"`
+	GoogleWorkspaceAdminEmail string `protobuf:"bytes,250,opt,name=google_workspace_admin_email,json=googleWorkspaceAdminEmail,proto3" json:"google_workspace_admin_email,omitempty" gorm:"default:null"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *AuthMethod) Reset() {
@@ -330,6 +340,27 @@ func (x *AuthMethod) GetPrompts() []string {
 		return x.Prompts
 	}
 	return nil
+}
+
+func (x *AuthMethod) GetCtGoogleWorkspaceServiceAccountJson() []byte {
+	if x != nil {
+		return x.CtGoogleWorkspaceServiceAccountJson
+	}
+	return nil
+}
+
+func (x *AuthMethod) GetGoogleWorkspaceServiceAccountJson() string {
+	if x != nil {
+		return x.GoogleWorkspaceServiceAccountJson
+	}
+	return ""
+}
+
+func (x *AuthMethod) GetGoogleWorkspaceAdminEmail() string {
+	if x != nil {
+		return x.GoogleWorkspaceAdminEmail
+	}
+	return ""
 }
 
 // Account represents an OIDC account
