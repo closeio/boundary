@@ -587,6 +587,54 @@ func DefaultLdapAuthMethodEnableGroups() Option {
 	}
 }
 
+func WithOidcAuthMethodGoogleWorkspaceAdminEmail(inGoogleWorkspaceAdminEmail string) Option {
+	return func(o *options) {
+		raw, ok := o.postMap["attributes"]
+		if !ok {
+			raw = any(map[string]any{})
+		}
+		val := raw.(map[string]any)
+		val["google_workspace_admin_email"] = inGoogleWorkspaceAdminEmail
+		o.postMap["attributes"] = val
+	}
+}
+
+func DefaultOidcAuthMethodGoogleWorkspaceAdminEmail() Option {
+	return func(o *options) {
+		raw, ok := o.postMap["attributes"]
+		if !ok {
+			raw = any(map[string]any{})
+		}
+		val := raw.(map[string]any)
+		val["google_workspace_admin_email"] = nil
+		o.postMap["attributes"] = val
+	}
+}
+
+func WithOidcAuthMethodGoogleWorkspaceServiceAccountJson(inGoogleWorkspaceServiceAccountJson string) Option {
+	return func(o *options) {
+		raw, ok := o.postMap["attributes"]
+		if !ok {
+			raw = any(map[string]any{})
+		}
+		val := raw.(map[string]any)
+		val["google_workspace_service_account_json"] = inGoogleWorkspaceServiceAccountJson
+		o.postMap["attributes"] = val
+	}
+}
+
+func DefaultOidcAuthMethodGoogleWorkspaceServiceAccountJson() Option {
+	return func(o *options) {
+		raw, ok := o.postMap["attributes"]
+		if !ok {
+			raw = any(map[string]any{})
+		}
+		val := raw.(map[string]any)
+		val["google_workspace_service_account_json"] = nil
+		o.postMap["attributes"] = val
+	}
+}
+
 func WithLdapAuthMethodGroupAttr(inGroupAttr string) Option {
 	return func(o *options) {
 		raw, ok := o.postMap["attributes"]
@@ -1075,54 +1123,6 @@ func DefaultLdapAuthMethodUserFilter() Option {
 		}
 		val := raw.(map[string]any)
 		val["user_filter"] = nil
-		o.postMap["attributes"] = val
-	}
-}
-
-func WithOidcAuthMethodGoogleWorkspaceServiceAccountJson(inGoogleWorkspaceServiceAccountJson string) Option {
-	return func(o *options) {
-		raw, ok := o.postMap["attributes"]
-		if !ok {
-			raw = any(map[string]any{})
-		}
-		val := raw.(map[string]any)
-		val["google_workspace_service_account_json"] = inGoogleWorkspaceServiceAccountJson
-		o.postMap["attributes"] = val
-	}
-}
-
-func DefaultOidcAuthMethodGoogleWorkspaceServiceAccountJson() Option {
-	return func(o *options) {
-		raw, ok := o.postMap["attributes"]
-		if !ok {
-			raw = any(map[string]any{})
-		}
-		val := raw.(map[string]any)
-		val["google_workspace_service_account_json"] = nil
-		o.postMap["attributes"] = val
-	}
-}
-
-func WithOidcAuthMethodGoogleWorkspaceAdminEmail(inGoogleWorkspaceAdminEmail string) Option {
-	return func(o *options) {
-		raw, ok := o.postMap["attributes"]
-		if !ok {
-			raw = any(map[string]any{})
-		}
-		val := raw.(map[string]any)
-		val["google_workspace_admin_email"] = inGoogleWorkspaceAdminEmail
-		o.postMap["attributes"] = val
-	}
-}
-
-func DefaultOidcAuthMethodGoogleWorkspaceAdminEmail() Option {
-	return func(o *options) {
-		raw, ok := o.postMap["attributes"]
-		if !ok {
-			raw = any(map[string]any{})
-		}
-		val := raw.(map[string]any)
-		val["google_workspace_admin_email"] = nil
 		o.postMap["attributes"] = val
 	}
 }

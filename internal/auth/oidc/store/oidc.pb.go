@@ -131,13 +131,17 @@ type AuthMethod struct {
 	// @inject_tag: `gorm:"-"`
 	Prompts []string `protobuf:"bytes,220,rep,name=prompts,proto3" json:"prompts,omitempty" gorm:"-"`
 	// ct_google_workspace_service_account_json is the encrypted Google service
-	// account JSON key. Stored in the column google_workspace_service_account_json.
+	// account JSON key used to call the Admin SDK Directory API. Stored as the
+	// column google_workspace_service_account_json in the database.
 	// @inject_tag: `gorm:"column:google_workspace_service_account_json;default:null" wrapping:"ct,google_workspace_service_account_json"`
 	CtGoogleWorkspaceServiceAccountJson []byte `protobuf:"bytes,230,opt,name=ct_google_workspace_service_account_json,json=ctGoogleWorkspaceServiceAccountJson,proto3" json:"ct_google_workspace_service_account_json,omitempty" gorm:"column:google_workspace_service_account_json;default:null" wrapping:"ct,google_workspace_service_account_json"`
-	// google_workspace_service_account_json is the plaintext service account JSON (not stored in the database).
+	// google_workspace_service_account_json is the plaintext service account
+	// JSON key. Not stored in the database.
 	// @inject_tag: `gorm:"-" wrapping:"pt,google_workspace_service_account_json"`
 	GoogleWorkspaceServiceAccountJson string `protobuf:"bytes,240,opt,name=google_workspace_service_account_json,json=googleWorkspaceServiceAccountJson,proto3" json:"google_workspace_service_account_json,omitempty" gorm:"-" wrapping:"pt,google_workspace_service_account_json"`
-	// google_workspace_admin_email is the admin email Boundary impersonates when calling the Directory API.
+	// google_workspace_admin_email is a Google Workspace admin email address
+	// that Boundary impersonates (via domain-wide delegation) when calling the
+	// Directory API to list a user's group memberships.
 	// @inject_tag: `gorm:"default:null"`
 	GoogleWorkspaceAdminEmail string `protobuf:"bytes,250,opt,name=google_workspace_admin_email,json=googleWorkspaceAdminEmail,proto3" json:"google_workspace_admin_email,omitempty" gorm:"default:null"`
 	unknownFields             protoimpl.UnknownFields
@@ -1130,7 +1134,7 @@ var File_controller_storage_auth_oidc_store_v1_oidc_proto protoreflect.FileDescr
 
 const file_controller_storage_auth_oidc_store_v1_oidc_proto_rawDesc = "" +
 	"\n" +
-	"0controller/storage/auth/oidc/store/v1/oidc.proto\x12%controller.storage.auth.oidc.store.v1\x1a*controller/custom_options/v1/options.proto\x1a/controller/storage/timestamp/v1/timestamp.proto\"\xc1\v\n" +
+	"0controller/storage/auth/oidc/store/v1/oidc.proto\x12%controller.storage.auth.oidc.store.v1\x1a*controller/custom_options/v1/options.proto\x1a/controller/storage/timestamp/v1/timestamp.proto\"\xd5\x0e\n" +
 	"\n" +
 	"AuthMethod\x12\x1b\n" +
 	"\tpublic_id\x18\n" +
@@ -1173,7 +1177,12 @@ const file_controller_storage_auth_oidc_store_v1_oidc_proto_rawDesc = "" +
 	"\x12account_claim_maps\x18\xd2\x01 \x03(\tB5\xc2\xdd)1\n" +
 	"\x10AccountClaimMaps\x12\x1dattributes.account_claim_mapsR\x10accountClaimMaps\x12<\n" +
 	"\aprompts\x18\xdc\x01 \x03(\tB!\xc2\xdd)\x1d\n" +
-	"\aPrompts\x12\x12attributes.promptsR\aprompts\"\x9a\x04\n" +
+	"\aPrompts\x12\x12attributes.promptsR\aprompts\x12V\n" +
+	"(ct_google_workspace_service_account_json\x18\xe6\x01 \x01(\fR#ctGoogleWorkspaceServiceAccountJson\x12\xac\x01\n" +
+	"%google_workspace_service_account_json\x18\xf0\x01 \x01(\tBY\xc2\xdd)U\n" +
+	"!GoogleWorkspaceServiceAccountJson\x120attributes.google_workspace_service_account_jsonR!googleWorkspaceServiceAccountJson\x12\x8a\x01\n" +
+	"\x1cgoogle_workspace_admin_email\x18\xfa\x01 \x01(\tBH\xc2\xdd)D\n" +
+	"\x19GoogleWorkspaceAdminEmail\x12'attributes.google_workspace_admin_emailR\x19googleWorkspaceAdminEmail\"\x9a\x04\n" +
 	"\aAccount\x12\x1b\n" +
 	"\tpublic_id\x18\n" +
 	" \x01(\tR\bpublicId\x12K\n" +
